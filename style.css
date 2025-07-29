@@ -1078,3 +1078,26 @@ h1 {
 
 
 }
+ .product-image {
+      height: 500px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .featured-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: gold;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .price {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #0d6efd;
+    }
+    .location-time {
+      font-size: 0.9rem;
+      color: gray;
+    }

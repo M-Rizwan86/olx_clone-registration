@@ -8,8 +8,9 @@ async function getData() {
 
     products.map((product) => {
         let { title, description, category, images, price } = product;
+        cardElement.innerHTML += "";
 
-        cardElement.innerHTML += `
+        cardElement.innerHTML +=  `
         <div class="card">
             <div class="badge">HOT SALE</div>
             <div class="tilt">
@@ -17,7 +18,7 @@ async function getData() {
             </div>
             <div class="info">
                 <div class="cat">${category}</div>
-                <h2 class="title">${title}</h2>
+                <h2 class="title"><a href="productsDetail.html?id=${product.id}">${title}</a></h2>
                 <p class="desc">${description}</p>
                 <div class="bottom">
                     <div class="price">
