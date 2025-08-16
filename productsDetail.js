@@ -1,13 +1,14 @@
+import {doc,db,getDoc} from "./config.js";
 let params = new URLSearchParams(window.location.search);
 let id = params.get('id');
 console.log(id);
 
 async function getProductDetail() {
-    let response = await fetch(`https://dummyjson.com/products/${id}`);
-    let data = await response.json();
+    const docRef = doc(db, "products", id);
+    const docSnap = await getDoc(docRef);
 
-    console.log(data);
-    let { title, description, category, images, price, rating, stock, warrantyInformation } = data;
+    if (docSnap.exists()) {
+        let { title, description, category, images, price, rating, stock, warrantyInformation } = docSnap.data();
 
     let pImage = document.getElementById('product-detail-image');
     let pName = document.getElementById('product-name');
@@ -43,6 +44,9 @@ async function getProductDetail() {
     pFeature1.innerHTML = `Rating: ${rating} <br> Stock: ${stock}`;
     pFeature2.innerHTML = `Warranty: ${warrantyInformation || 'N/A'}`;
     pFeature3.innerHTML = `Category: ${category}`;
-}
+}else{
+   detailContainer.innerHTML = "<p> Product not found</p>";
+    
+}}
 
 getProductDetail();

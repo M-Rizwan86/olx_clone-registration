@@ -1,20 +1,22 @@
+import {
+    getAuth, getDocs, getDoc, setDoc, doc, app, db, onAuthStateChanged, signInWithEmailAndPassword,
+    createUserWithEmailAndPassword, signOut, collection
+}
+    from "./config.js";
 let cardElement = document.getElementById("cards");
 
-// ✅ Fetch and Display Products
-async function getData() {
-    let response = await fetch('https://dummyjson.com/products');
-    let data = await response.json();
-    let { products } = data;
 
-    products.map((product) => {
-        let { title, description, category, images, price } = product;
+async function getData() {
+    const querySnapshot = await getDocs(collection(db, "products"));
+    querySnapshot.forEach((product) => {
+        let { title, description, category, images, price } = product.data();
         cardElement.innerHTML += "";
 
-        cardElement.innerHTML +=  `
+        cardElement.innerHTML += `
         <div class="card">
             <div class="badge">HOT SALE</div>
             <div class="tilt">
-                <div class="img"><img src="${images[0]}" alt="Premium Laptop"></div>
+                <div class="img"><img src="${images}" alt="Premium Laptop"></div>
             </div>
             <div class="info">
                 <div class="cat">${category}</div>
@@ -36,101 +38,141 @@ async function getData() {
             </div>
         </div>`;
     });
+   
 }
+
 getData();
 
 
-// ✅ Handle Users
-let userarr = JSON.parse(localStorage.getItem('user')) || [];
 
-class Person {
-    constructor(fullName, email, password) {
-        this.fullName = fullName;
-        this.email = email;
-        this.password = password;
-    }
-}
+
 
 // Register
-let fullName = document.getElementById('name');
-let email = document.getElementById('email');
-let password = document.getElementById('password');
 
-function registerUser(event) {
-    event.preventDefault();
+let registerBtn = document.getElementById('registerBtn');
 
-    let checkStoredUser = userarr.find((element) => element.email === email.value);
-    if (checkStoredUser) {
-        alert("User already exists");
-    } else {
-        let newUser = new Person(fullName.value, email.value, password.value);
-        userarr.push(newUser);
-        localStorage.setItem('user', JSON.stringify(userarr));
-        alert("User registered successfully \nPlease login now");
+registerBtn.addEventListener('click', (e) => {
+    e.preventDefault();  // stop form from refreshing
+    registerUser();
+});
+const auth = getAuth(app);
+async function registerUser() {
+
+
+    let fullNameField = document.getElementById('name');
+    let emailField = document.getElementById('email');
+    let passwordField = document.getElementById('password');
+    let fullname = fullNameField.value;
+    let email = emailField.value;
+    let password = passwordField.value;
+
+    try {
+        // Create user in Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        console.log(user.uid)
+        // Add user data to Firestore with UID as document ID
+
+        await storeUser(fullname, email, user.uid)
+
+
 
         // Hide register modal
         let modalElement = document.getElementById('registerModal');
         let registerModal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
         registerModal.hide();
+
+        // Clear input fields
+        fullNameField.value = "";
+        emailField.value = "";
+        passwordField.value = "";
+
+
+    } catch (error) {
+        console.log("Error during registration:", error.message);
     }
-    fullName.value = "";
-    email.value = "";
-    password.value = "";
 }
-
-// Login
-let loginEmail = document.getElementById('loginEmail');
-let loginPassword = document.getElementById('loginPassword');
-
-function loginUser(event) {
-    event.preventDefault();
-
-    // Always get updated data from localStorage
-    let storedUser = JSON.parse(localStorage.getItem('user')) || [];
-
-    let savedUser = storedUser.find((element) => element.email === loginEmail.value);
-    if (savedUser?.password === loginPassword.value && savedUser?.email === loginEmail.value) {
-        localStorage.setItem('LoggedUser', JSON.stringify(savedUser));
-        alert(`Logged in successfully, ${savedUser.fullName}`);
-
-        // Hide login modal
-        let modalElement = document.getElementById('loginModal');
-        let loginModal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-        loginModal.hide();
-
-
-
-        showUserProfile();
-    } else {
-        alert("Invalid credentials");
+async function storeUser(fullname, email, uid) {
+    try {
+        await setDoc(doc(db, "users", uid), {
+            fullName: fullname,
+            email: email,
+            uid: uid
+        });
+        console.log("User stored successfully");
+    } catch (error) {
+        console.error("Error storing user:", error);
     }
-    loginEmail.value = "";
-    loginPassword.value = "";
+
 }
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const uid = user.uid;
 
+        // Fetch Firestore document
+        const docRef = doc(db, "users", uid);
+        const docSnap = await getDoc(docRef);
 
-function logoutUser() {
-    localStorage.removeItem('LoggedUser');
-    document.getElementById('loginBtn').style.display = 'block';
-    document.getElementById('login-underline').style.display = 'block';
-    document.getElementById('profile-Dropdown').style.display = 'none';
-    alert("Logged out successfully");
-}
+        if (docSnap.exists()) {
+            loggedUser = docSnap.data();
 
+            console.log("Username:", loggedUser.fullName);
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('login-underline').style.display = 'none';
+            document.getElementById('profile-Dropdown').style.display = 'block';
+            document.getElementById('username-sec').innerText = loggedUser.fullName;
+            document.getElementById('email-sec').innerText = loggedUser.email;
+            document.getElementById('sellBtn').style.display = 'block';
 
-function showUserProfile() {
-    let currentUser = JSON.parse(localStorage.getItem('LoggedUser'));
-
-    if (currentUser) {
-        document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('login-underline').style.display = 'none';
-        document.getElementById('profile-Dropdown').style.display = 'block';
-        document.getElementById('username-sec').innerText = currentUser.fullName;
-        document.getElementById('email-sec').innerText = currentUser.email;
+        } else {
+            loggedUser = null;
+            console.log("User document not found!");
+        }
     } else {
         document.getElementById('loginBtn').style.display = 'block';
         document.getElementById('login-underline').style.display = 'block';
         document.getElementById('profile-Dropdown').style.display = 'none';
+
     }
+});
+
+// Login
+let loginEmail = document.getElementById('loginEmail');
+let loginPassword = document.getElementById('loginPassword');
+let loginBtn = document.getElementById('loginButton');
+
+loginBtn.addEventListener('click', (e) => {
+    e.preventDefault();  // stop form from refreshing
+    loginUser();
+});
+function loginUser() {
+    const email = loginEmail.value;
+    const password = loginPassword.value;
+
+    const auth = getAuth();
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+        })
+        .catch((error) => {
+            const errorMessage = error.message;
+            console.log(errorMessage)
+        });
+    // Hide login modal
+    let modalElement = document.getElementById('loginModal');
+    let loginModal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+    loginModal.hide();
+    loginEmail.value = "";
+    loginPassword.value = "";
 }
-showUserProfile();
+
+document.getElementById('logoutBtn').addEventListener('click', logoutUser);
+function logoutUser() {
+    signOut(auth).then(() => {
+        alert("User logged out successfully");
+        window.location.href = "index.html";
+    }).catch((error) => {
+        console.error("Error logging out:", error);
+    });
+
+}
