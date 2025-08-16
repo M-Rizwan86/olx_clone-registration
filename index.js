@@ -114,7 +114,11 @@ onAuthStateChanged(auth, async (user) => {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
+<<<<<<< HEAD
             let loggedUser = docSnap.data();
+=======
+           let loggedUser = docSnap.data();
+>>>>>>> 23fd5222f15b73037d09c9eb6fe8a37a9b5bbf60
 
             console.log("Username:", loggedUser.fullName);
             document.getElementById('loginBtn').style.display = 'none';
