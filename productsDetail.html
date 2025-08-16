@@ -79,40 +79,51 @@
         </div>
     </header>
     <!-- Product Section -->
-    <div class="container my-5">
-        <div class="row g-5" >
-            <!-- Product Image -->
-            <div class="col-md-6">
-  <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner" id="product-detail-image">
-      <!-- JS will inject items here -->
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-  </div>
-</div>
+   <div class="container my-5">
+    <div class="row g-5">
+        <!-- Product Image -->
+        <div class="col-md-6">
+            <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner" id="product-detail-image">
+                    <!-- JS will inject items here -->
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
 
+        <!-- Product Details -->
+        <div class="col-md-6">
+            <h2 class="fw-bold" id="product-name"></h2>
+            <p class="text-muted" id="product-category"></p>
+            <h4 class="text-success" id="product-price"></h4>
+            <p class="mt-4" id="product-description"></p>
+            <ul class="list-group list-group-flush mb-4">
+                <li class="list-group-item" id="product-feature-1"></li>
+                <li class="list-group-item" id="product-feature-2"></li>
+                <li class="list-group-item" id="product-feature-3"></li>
+            </ul>
 
-            <!-- Product Details -->
-            <div class="col-md-6">
-                <h2 class="fw-bold" id="product-name"></h2>
-                <p class="text-muted" id="product-category"> </p>
-                <h4 class="text-success" id="product-price"></h4>
-                <p class="mt-4" id="product-description"></p>
-                <ul class="list-group list-group-flush mb-4">
-                    <li class="list-group-item" id="product-feature-1"></li>
-                    <li class="list-group-item" id="product-feature-2"></li>
-                    <li class="list-group-item" id="product-feature-3"></li>
-                </ul>
+            <!-- Seller / Owner Details -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Seller Information</h5>
+                    <p class="mb-1"><strong>Name:</strong> <span id="seller-name"></span></p>
+                    <p class="mb-1"><strong>Email:</strong> <span id="seller-email"></span></p>
+                    <p class="mb-1"><strong>Phone:</strong> <span id="seller-phone">not available</span></p>
+                    <p class="mb-0"><strong>Location:</strong> <span id="seller-location">not available</span></p>
+                </div>
             </div>
         </div>
     </div>
+</div>
+
 
    
 
